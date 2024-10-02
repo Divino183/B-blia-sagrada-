@@ -1,0 +1,79 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: Arial, sans-serif;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  /*height: 100vh;*/
+}
+
+.header {
+  background-image: url("Praia.jpg");
+  background-position: center;
+  background-size: cover;
+  padding: 10px;
+  text-align: center;
+  position: relative;
+  height: 30vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header h1 {
+  background-color: #00000087;
+  color: white;
+  border-radius: 10px;
+}
+
+.settings-icon {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
+}
+
+.main-content {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: 10px;
+  padding: 10px;
+  background-color: #f0f0f0;
+}
+
+.menu-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  text-decoration: none;
+}
+
+.menu-item span {
+  color: #000;
+  font-weight: bold;
+}
+  
+.menu-item:nth-child(odd) {
+  background-color: #e6f2ff;
+}
+  
+.menu-item:nth-child(even) {
+  background-color: #e6e6fa;
+}
+  
+.menu-icon {
+  font-size: 30px;
+  margin-bottom: 10px;
+}  
