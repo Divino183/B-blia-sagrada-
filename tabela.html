@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+ <title>Tabela de Conversão Profética Interativa</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background-color: #dacaca;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+.container {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    overflow: hidden;
+    max-width: 600px;
+    width: 100%;
+    top: 0;
+    position: relative;
+}
+.header {
+    background-color: #cc0000;
+    color: white;
+    text-align: center;
+    padding: 15px;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+}
+th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+.reference {
+    cursor: pointer;
+    color: #0066cc;
+    text-decoration: none;
+}
+#versePopup {
+    display: none;
+    position: absolute;
+    top: 5;
+    left: 10;
+    right: 10;
+    /*background-color: rgba(255, 255, 255, 0.95);*/
+    background-color: #000;
+    color: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    z-index: 10;
+}
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+    .container {
+        border-radius: 0;
+    }
+    th, td {
+        padding: 8px;
+        font-size: 0.9em;
+    }
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="header">Tabela de Conversão Profética</div>
+    <div id="versePopup"></div>
+    <table>
+        <tr>
+            <th>Símbolo</th>
+            <th>Significado</th>
+            <th>Referência</th>
+        </tr>
+        <tr>
+            <td>Animal</td>
+            <td>Rei ou reino</td>
+            <td><span class="reference" data-verse="Dn 7:17,23">Dn 7:17,23</span></td>
+        </tr>
+        <tr>
+            <td>Mulher</td>
+            <td>igreja</td>
+            <td><span class="reference" data-verse="Ef 5:23,32">Ef 5:23,32</span></td>
+        </tr>
+        <tr>
+            <td>Água</td>
+            <td>Povos</td>
+            <td><span class="reference" data-verse="Ap 17:15">Ap 17:15</span></td>
+        </tr>
+        <tr>
+            <td>1 Dia</td>
+            <td>1 Anos</td>
+            <td><span class="reference" data-verse="Ez 4:6">Ez 4:6</span></td>
+        </tr>
+        <tr>
+            <td>Ventos</td>
+            <td>guerras</td>
+            <td><span class="reference" data-verse="Jr 52:2,3">Jr 52:2,3</span></td>
+        </tr>
+        <tr>
+            <td>Chifre</td>
+            <td>Poder, Rei ou Reino</td>
+            <td><span class="reference" data-verse="Ap 17:12">Ap 17:12</span></td>
+        </tr>
+        <tr>
+            <td>Tempos</td>
+            <td>Anos</td>
+            <td><span class="reference" data-verse="Dn 11:13">Dn 11:13</span></td>
+        </tr>
+        <tr>
+            <td>Estrelas</td>
+            <td>Mensageiros</td>
+            <td><span class="reference" data-verse="Ap 12:4">Ap 12:4</span></td>
+        </tr>
+        <tr>
+            <td>Cordeiro</td>
+            <td>Jesus</td>
+            <td><span class="reference" data-verse="Jo 1:29">Jo 1:29</span></td>
+        </tr>
+        <tr>
+            <td>Cauda</td>
+            <td>Falso Profeta</td>
+            <td><span class="reference" data-verse="Is 9:15">Is 9:15</span></td>
+        </tr>
+        <tr>
+            <td>Dragão</td>
+            <td>Diabo</td>
+            <td><span class="reference" data-verse="Ap 12:9">Ap 12:9</span></td>
+        </tr>
+    </table>
+</div>
+
+<script>
+const versePopup = document.getElementById('versePopup');
+const references = document.querySelectorAll('.reference');
+const container = document.querySelector('.container');
+
+const verses = {
+    "Dn 7:17,23": {
+        "17": "Estes quatro grandes animais são quatro reis que se levantarão da terra.",
+        "23": "Assim ele disse: O quarto animal será o quarto reino na terra, o qual será diferente de todos os reinos; e devorará toda a terra, e a pisará aos pés, e a fará em pedaços."
+    },
+    "Ef 5:23,32": {
+        "23": "Porque o marido é a cabeça da mulher, como também Cristo é a cabeça da igreja, sendo ele próprio o salvador do corpo.",
+        "32": "Grande é este mistério; digo-o, porém, a respeito de Cristo e da igreja."
+    },
+    "Ap 17:15": "E disse-me: As águas que viste, onde se assenta a prostituta, são povos, multidões, nações e línguas.",
+    "Ez 4:6": "E, quando cumprires estes, tornarás a deitar-te sobre o teu lado direito, e levarás a iniquidade da casa de Judá quarenta dias; um dia te dei para cada ano.",
+    "Jr 52:2,3": {
+        "2": "E fez o que era mau aos olhos do Senhor, conforme tudo o que fizera Jeoiaquim.",
+        "3": "Assim sucedeu, por causa da ira do Senhor contra Jerusalém e Judá, até que ele os lançou da sua presença; e Zedequias se rebelou contra o rei da Babilônia."
+    },
+    "Ap 17:12": "E os dez chifres que viste são dez reis, que ainda não receberam o reino, mas receberão autoridade como reis por uma hora, juntamente com a besta.",
+    "Dn 11:13": "Porque o rei do norte tornará, e levantará uma multidão maior do que a primeira, e ao cabo de tempos, isto é, de anos, virá à pressa com grande exército e com muitas riquezas.",
+    "Ap 12:4": "E a sua cauda levou após si a terça parte das estrelas do céu, e lançou-as sobre a terra; e o dragão parou diante da mulher que havia de dar à luz, para que, dando ela à luz, lhe devorasse o filho.",
+    "Jo 1:29": "No dia seguinte João viu a Jesus, que vinha para ele, e disse: Eis o Cordeiro de Deus, que tira o pecado do mundo.",
+    "Is 9:15": "O ancião e o homem de respeito é a cabeça; e o profeta que ensina mentiras é a cauda.",
+    "Ap 12:9": "E foi precipitado o grande dragão, a antiga serpente, chamada o Diabo, e Satanás, que engana todo o mundo; ele foi precipitado na terra, e os seus anjos foram lançados com ele."
+};
+
+references.forEach(ref => {
+    ref.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const verseRef = ref.dataset.verse;
+        const verse = verses[verseRef];
+        let content = '';
+        
+        if (typeof verse === 'object') {
+            for (let [key, value] of Object.entries(verse)) {
+                content += `<p><strong>${verseRef.split(',')[0]}:${key}</strong> ${value}</p>`;
+            }
+        } else {
+            content = `<p><strong>${verseRef}</strong> ${verse}</p>`;
+        }
+        
+        versePopup.innerHTML = content;
+        versePopup.style.display = 'block';
+    });
+});
+
+document.addEventListener('click', (e) => {
+    if (e.target !== versePopup && !versePopup.contains(e.target)) {
+        versePopup.style.display = 'none';
+    }
+});
+</script>
+</body></html>

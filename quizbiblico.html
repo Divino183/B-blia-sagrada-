@@ -1,0 +1,274 @@
+<html>
+<head>
+<title>Quiz Bíblico Dinâmico - Teste seu Conhecimento</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: rgb(104,98,213);
+    background: linear-gradient(to right, rgba(104,98,213,1) 5%, rgba(36,20,51,0.9104875662387946) 40%, rgba(2,204,245,1) 94%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+  
+  .quiz-container {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    max-width: 500px;
+    width: 100%;
+  }
+  h1 {
+    color: #4682b4;
+    text-align: center;
+  }
+  .question {
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  .options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  button {
+    padding: 10px;
+    background-color: #4682b4;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  button:hover {
+    background-color: #36648b;
+  }
+  #result {
+    text-align: center;
+    font-weight: bold;
+    margin-top: 20px;
+  }
+  .progress {
+    margin-top: 20px;
+    background-color: #e0e0e0;
+    border-radius: 5px;
+    height: 20px;
+    overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%;
+    background-color: #4682b4;
+    width: 0;
+    transition: width 0.5s;
+  }
+  #playAgain {
+    display: block;
+    margin: 20px auto 0;
+    padding: 10px 20px;
+    font-size: 16px;
+  }
+</style>
+</head>
+<body>
+<div class="quiz-container">
+  <h1>Quiz Bíblico Dinâmico</h1>
+  <div id="quiz">
+    <div class="question" id="question"></div>
+    <div class="options" id="options"></div>
+  </div>
+  <div id="result"></div>
+  <div class="progress">
+    <div class="progress-bar" id="progress"></div>
+  </div>
+  <button id="playAgain" style="display: none;">Jogar Novamente</button>
+</div>
+
+<script>
+const allQuestions = [
+  {
+    question: "Quem construiu a arca?",
+    options: ["Noé", "Moisés", "Abraão", "Davi"],
+    correct: 0
+  },
+  {
+    question: "Quantos livros há no Novo Testamento?",
+    options: ["27", "39", "66", "73"],
+    correct: 0
+  },
+  {
+    question: "Quem era o pai de Salomão?",
+    options: ["Saul", "Davi", "Josias", "Samuel"],
+    correct: 1
+  },
+  {
+    question: "Qual profeta foi engolido por um grande peixe?",
+    options: ["Elias", "Jonas", "Jeremias", "Isaías"],
+    correct: 1
+  },
+  {
+    question: "Quantos dias e noites choveu durante o dilúvio?",
+    options: ["30", "40", "50", "60"],
+    correct: 1
+  },
+  {
+    question: "Quem traiu Jesus por 30 moedas de prata?",
+    options: ["Pedro", "João", "Judas", "Tomé"],
+    correct: 2
+  },
+  {
+    question: "Qual o primeiro livro da Bíblia?",
+    options: ["Êxodo", "Gênesis", "Levítico", "Números"],
+    correct: 1
+  },
+  {
+    question: "Quem liderou os israelitas para fora do Egito?",
+    options: ["Josué", "Moisés", "Abraão", "Isaque"],
+    correct: 1
+  },
+  {
+    question: "Qual era o nome original de Paulo antes de sua conversão?",
+    options: ["Silas", "Barnabé", "Timóteo", "Saulo"],
+    correct: 3
+  },
+  {
+    question: "Quem escreveu a maior parte do Novo Testamento?",
+    options: ["Pedro", "João", "Paulo", "Lucas"],
+    correct: 2
+  },
+  {
+    question: "Qual era o nome do jardim onde Adão e Eva viviam?",
+    options: ["Éden", "Getsêmani", "Babilônia", "Canaã"],
+    correct: 0
+  },
+  {
+    question: "Quem matou o gigante Golias?",
+    options: ["Saul", "Davi", "Sansão", "Samuel"],
+    correct: 1
+  },
+  {
+    question: "Qual animal falou com Balaão?",
+    options: ["Camelo", "Ovelha", "Jumento", "Boi"],
+    correct: 2
+  },
+  {
+    question: "Quantos discípulos Jesus tinha?",
+    options: ["10", "11", "12", "13"],
+    correct: 2
+  },
+  {
+    question: "Qual o último livro da Bíblia?",
+    options: ["Apocalipse", "João", "Judas", "Hebreus"],
+    correct: 0
+  },
+  {
+    question: "Quem foi o primeiro rei de Israel?",
+    options: ["Davi", "Saul", "Salomão", "Samuel"],
+    correct: 1
+  },
+  {
+    question: "Qual o nome da mãe de Jesus?",
+    options: ["Maria", "Isabel", "Ana", "Rebeca"],
+    correct: 0
+  },
+  {
+    question: "Quantas pragas Deus enviou ao Egito?",
+    options: ["7", "10", "12", "14"],
+    correct: 1
+  },
+  {
+    question: "Quem negou Jesus três vezes?",
+    options: ["João", "Pedro", "Tiago", "André"],
+    correct: 1
+  },
+  {
+    question: "Em que monte Moisés recebeu os Dez Mandamentos?",
+    options: ["Sinai", "Horebe", "Carmelo", "Tabor"],
+    correct: 0
+  }
+];
+
+let questions = [];
+let currentQuestion = 0;
+let correctAnswers = 0;
+let wrongAnswers = 0;
+
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+function initializeQuiz() {
+  shuffleArray(allQuestions);
+  questions = allQuestions.slice(0, 15);
+  currentQuestion = 0;
+  correctAnswers = 0;
+  wrongAnswers = 0;
+  document.getElementById('quiz').style.display = 'block';
+  document.getElementById('playAgain').style.display = 'none';
+  document.getElementById('result').textContent = '';
+  loadQuestion();
+}
+
+function loadQuestion() {
+  const question = questions[currentQuestion];
+  document.getElementById('question').textContent = question.question;
+  const options = document.getElementById('options');
+  options.innerHTML = '';
+  question.options.forEach((option, index) => {
+    const button = document.createElement('button');
+    button.textContent = option;
+    button.onclick = () => selectAnswer(index);
+    options.appendChild(button);
+  });
+  updateProgress();
+}
+
+function selectAnswer(index) {
+  if (index === questions[currentQuestion].correct) {
+    correctAnswers++;
+  } else {
+    wrongAnswers++;
+    if (wrongAnswers > 3) {
+      endQuiz(false);
+      return;
+    }
+  }
+  currentQuestion++;
+  if (currentQuestion < questions.length) {
+    loadQuestion();
+  } else {
+    endQuiz(true);
+  }
+}
+
+function endQuiz(success) {
+  const resultDiv = document.getElementById('result');
+  if (success) {
+    resultDiv.textContent = `Parabéns! Você acertou ${correctAnswers} de 15 perguntas e errou apenas ${wrongAnswers}.`;
+    resultDiv.style.color = 'green';
+  } else {
+    resultDiv.textContent = `Você perdeu! Errou mais de 3 perguntas. Total de erros: ${wrongAnswers}`;
+    resultDiv.style.color = 'red';
+  }
+  document.getElementById('quiz').style.display = 'none';
+  document.getElementById('playAgain').style.display = 'block';
+}
+
+function updateProgress() {
+  const progress = document.getElementById('progress');
+  const percentage = (currentQuestion / questions.length) * 100;
+  progress.style.width = `${percentage}%`;
+}
+
+document.getElementById('playAgain').addEventListener('click', initializeQuiz);
+
+initializeQuiz();
+</script>
+</body></html>

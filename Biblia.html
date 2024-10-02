@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bíblia</title>
+<style>
+  body, html {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    height: 100%;
+  }
+  .app-container {
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: white;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    background-color: #233aae;
+    color: white;
+    padding: 1rem;
+    text-align: center;
+  }
+  header h1 {
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+  }
+  #versao-biblia {
+    font-size: 0.9rem;
+    font-style: italic;
+  }
+  nav {
+    background-color: #5cd8ec;
+    padding: 0.5rem;
+    display: flex;
+    justify-content: space-around;
+  }
+  nav button {
+    background-color: transparent;
+    border: 1px solid #ffffff;
+    border-radius: 5px;
+    color: black;
+    font-weight: bold;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  nav button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+  main {
+    flex-grow: 1;
+    padding: 1rem;
+    overflow-y: auto;
+  }
+  #conteudo {
+    font-size: 1rem;
+  }
+  .lista-items {
+    list-style-type: none;
+    padding: 0;
+  }
+  .lista-items li {
+    cursor: pointer;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+  }
+  .lista-items li:hover {
+    background-color: #e0e0e0;
+  }
+  .versiculo {
+    margin-bottom: 1rem;
+  }
+  .versiculo-numero {
+    font-weight: bold;
+    color: #4a148c;
+  }
+  #navegacao {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  #navegacao button, #navegacao select {
+    background-color: #4a148c;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 10px;
+  }
+  #navegacao button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  #capitulo-navegacao {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+  }
+  #capitulo-navegacao button {
+    background-color: #7e57c2;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  #capitulo-navegacao button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  #capitulo-info {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
+  #versao {
+    background-color: #4a148c;
+    color: white;
+    border: none;
+    padding: 0.1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 190px;
+    font-size: 8px;
+  }
+  #versao option {
+    background-color: white;
+    color: #4a148c;
+  }
+</style>
+</head>
+<body>
+  <div class="app-container">
+    <header>
+      <h1>Bíblia Sagrada</h1>
+      <div id="versao-biblia">Nova Versão Internacional (NVI)</div>
+    </header>
+    <nav>
+      <button id="antigo-testamento">Antigo Testamento</button>
+      <button id="novo-testamento">Novo Testamento</button>
+    </nav>
+    <main>
+      <div id="navegacao">
+        <button id="voltar" disabled>Voltar</button>
+        <select id="versao">
+          <option value="nvi">Nova Versão Internacional (NVI)</option>
+          <option value="acf">Almeida Corrigida Fiel (ACF)</option>
+          <option value="aa">Almeida Atualizada (AA)</option>
+          <option value="kjv">King James Version (KJV)</option>
+        </select>
+        <button id="inicio">Início</button>
+      </div>
+      <div id="capitulo-info"></div>
+      <div id="conteudo"></div>
+      <div id="capitulo-navegacao" style="display: none;">
+        <button id="capitulo-anterior" disabled>Capítulo Anterior</button>
+        <button id="proximo-capitulo" disabled>Próximo Capítulo</button>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    const conteudoElement = document.getElementById('conteudo');
+    const antigoTestamentoButton = document.getElementById('antigo-testamento');
+    const novoTestamentoButton = document.getElementById('novo-testamento');
+    const voltarButton = document.getElementById('voltar');
+    const inicioButton = document.getElementById('inicio');
+    const capituloAnteriorButton = document.getElementById('capitulo-anterior');
+    const proximoCapituloButton = document.getElementById('proximo-capitulo');
+    const capituloNavegacaoElement = document.getElementById('capitulo-navegacao');
+    const capituloInfoElement = document.getElementById('capitulo-info');
+    const versaoSelector = document.getElementById('versao');
+    const versaoBibliaElement = document.getElementById('versao-biblia');
+
+    let estadoAtual = 'inicio';
+    let livroAtual = '';
+    let capituloAtual = 0;
+    let totalCapitulos = 0;
+    let versaoAtual = 'nvi';
+
+    function listarLivros(testamento) {
+      estadoAtual = 'livros';
+      voltarButton.disabled = false;
+      capituloNavegacaoElement.style.display = 'none';
+      capituloInfoElement.innerHTML = '';
+      axios.get(`https://www.abibliadigital.com.br/api/books`)
+        .then(response => {
+          const livros = response.data.filter(livro => livro.testament === testamento);
+          let listaHTML = '<ul class="lista-items">';
+          livros.forEach(livro => {
+            listaHTML += `<li data-abbrev="${livro.abbrev.pt}">${livro.name}</li>`;
+          });
+          listaHTML += '</ul>';
+          conteudoElement.innerHTML = listaHTML;
+          adicionarEventosLivros();
+        })
+        .catch(error => {
+          console.error('Erro ao listar livros:', error);
+        });
+    }
+
+    function listarCapitulos(abreviacao) {
+      estadoAtual = 'capitulos';
+      livroAtual = abreviacao;
+      capituloNavegacaoElement.style.display = 'none';
+      capituloInfoElement.innerHTML = '';
+      axios.get(`https://www.abibliadigital.com.br/api/books/${abreviacao}`)
+        .then(response => {
+          totalCapitulos = response.data.chapters;
+          let listaHTML = '<ul class="lista-items">';
+          for (let i = 1; i <= totalCapitulos; i++) {
+            listaHTML += `<li data-capitulo="${i}">Capítulo ${i}</li>`;
+          }
+          listaHTML += '</ul>';
+          conteudoElement.innerHTML = listaHTML;
+          adicionarEventosCapitulos();
+        })
+        .catch(error => {
+          console.error('Erro ao listar capítulos:', error);
+        });
+    }
+
+    function mostrarVersiculos(abreviacao, capitulo) {
+      estadoAtual = 'versiculos';
+      capituloAtual = parseInt(capitulo);
+      
+      let apiUrl = `https://www.abibliadigital.com.br/api/verses/${versaoAtual}/${abreviacao}/${capitulo}`;
+      
+      if (versaoAtual === 'hhh') {
+        simularVersiculosHebraico(abreviacao, capitulo);
+      } else {
+        axios.get(apiUrl)
+          .then(response => {
+            let versiculosHTML = '';
+            response.data.verses.forEach(versiculo => {
+              versiculosHTML += `
+                <div class="versiculo">
+                  <span class="versiculo-numero">${versiculo.number}</span>
+                  ${versiculo.text}
+                </div>
+              `;
+            });
+            conteudoElement.innerHTML = versiculosHTML;
+            atualizarNavegacaoCapitulos();
+            capituloInfoElement.innerHTML = `${response.data.book.name} - Capítulo ${capitulo}`;
+          })
+          .catch(error => {
+            console.error('Erro ao mostrar versículos:', error);
+          });
+      }
+    }
+
+    function simularVersiculosHebraico(abreviacao, capitulo) {
+      const versiculosSimulados = [
+        "בְּרֵאשִׁית בָּרָא אֱלֹהִים אֵת הַשָּׁמַיִם וְאֵת הָאָרֶץ׃",
+        "וְהָאָרֶץ הָיְתָה תֹהוּ וָבֹהוּ וְחֹשֶׁךְ עַל־פְּנֵי תְהוֹם וְרוּחַ אֱלֹהִים מְרַחֶפֶת עַל־פְּנֵי הַמָּיִם׃",
+        "וַיֹּאמֶר אֱלֹהִים יְהִי אוֹר וַיְהִי־אוֹר׃",
+        "וַיַּרְא אֱלֹהִים אֶת־הָאוֹר כִּי־טוֹב וַיַּבְדֵּל אֱלֹהִים בֵּין הָאוֹר וּבֵין הַחֹשֶׁךְ׃",
+        "וַיִּקְרָא אֱלֹהִים לָאוֹר יוֹם וְלַחֹשֶׁךְ קָרָא לָיְלָה וַיְהִי־עֶרֶב וַיְהִי־בֹקֶר יוֹם אֶחָד׃"
+      ];
+
+      let versiculosHTML = '';
+      versiculosSimulados.forEach((versiculo, index) => {
+        versiculosHTML += `
+          <div class="versiculo" style="direction: rtl; text-align: right;">
+            <span class="versiculo-numero">${index + 1}</span>
+            ${versiculo}
+          </div>
+        `;
+      });
+
+      conteudoElement.innerHTML = versiculosHTML;
+      atualizarNavegacaoCapitulos();
+      capituloInfoElement.innerHTML = `${abreviacao} - פרק ${capitulo}`;
+    }
+
+    function atualizarNavegacaoCapitulos() {
+      capituloNavegacaoElement.style.display = 'flex';
+      capituloAnteriorButton.disabled = capituloAtual <= 1;
+      proximoCapituloButton.disabled = capituloAtual >= totalCapitulos;
+    }
+
+    function adicionarEventosLivros() {
+      const livros = document.querySelectorAll('.lista-items li');
+      livros.forEach(livro => {
+        livro.addEventListener('click', (e) => {
+          const abreviacao = e.target.getAttribute('data-abbrev');
+          listarCapitulos(abreviacao);
+        });
+      });
+    }
+
+    function adicionarEventosCapitulos() {
+      const capitulos = document.querySelectorAll('.lista-items li');
+      capitulos.forEach(capitulo => {
+        capitulo.addEventListener('click', (e) => {
+          const numeroCapitulo = e.target.getAttribute('data-capitulo');
+          mostrarVersiculos(livroAtual, numeroCapitulo);
+        });
+      });
+    }
+
+    function mostrarInicio() {
+      estadoAtual = 'inicio';
+      voltarButton.disabled = true;
+      capituloNavegacaoElement.style.display = 'none';
+      capituloInfoElement.innerHTML = '';
+      conteudoElement.innerHTML = '<p>Bem-vindo à Bíblia Sagrada App. Escolha um testamento para começar.</p>';
+    }
+
+    function voltar() {
+      switch (estadoAtual) {
+        case 'capitulos':
+          listarLivros(livroAtual.startsWith('1') || livroAtual.startsWith('2') ? 'VT' : 'NT');
+          break;
+        case 'versiculos':
+          listarCapitulos(livroAtual);
+          break;
+        default:
+          mostrarInicio();
+      }
+    }
+
+    function irParaCapituloAnterior() {
+      if (capituloAtual > 1) {
+        mostrarVersiculos(livroAtual, capituloAtual - 1);
+      }
+    }
+
+    function irParaProximoCapitulo() {
+      if (capituloAtual < totalCapitulos) {
+        mostrarVersiculos(livroAtual, capituloAtual + 1);
+      }
+    }
+
+    function atualizarVersaoBiblia() {
+      versaoAtual = versaoSelector.value;
+      const versaoTexto = versaoSelector.options[versaoSelector.selectedIndex].text;
+      versaoBibliaElement.textContent = versaoTexto;
+      if (estadoAtual === 'versiculos') {
+        mostrarVersiculos(livroAtual, capituloAtual);
+      }
+    }
+
+    antigoTestamentoButton.addEventListener('click', () => listarLivros('VT'));
+    novoTestamentoButton.addEventListener('click', () => listarLivros('NT'));
+    voltarButton.addEventListener('click', voltar);
+    inicioButton.addEventListener('click', mostrarInicio);
+    capituloAnteriorButton.addEventListener('click', irParaCapituloAnterior);
+    proximoCapituloButton.addEventListener('click', irParaProximoCapitulo);
+    versaoSelector.addEventListener('change', atualizarVersaoBiblia);
+
+    mostrarInicio();
+  </script>
+</body>
+</html>
